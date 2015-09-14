@@ -1,0 +1,20 @@
+consul:
+  data_dir: /var/lib/consul/data
+  ui_dir: /var/lib/consul/ui
+  datacenter: dc1
+  nameservers:
+    - 8.8.8.8
+  ports:
+    udp:
+      dns: 53
+  server_pattern: 'consul-server*'
+  services:
+    example:
+      name: "example",
+      tags:
+        - example
+      address: webservice.example.com
+      port: 80
+      checks:
+        - http: http://webservice.example.com
+          interval: 5m
