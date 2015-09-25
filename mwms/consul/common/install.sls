@@ -1,5 +1,8 @@
 {% set consul_data_dir = salt['pillar.get']('consul:data_dir', '/var/lib/consul/data') %}
 
+include:
+  - mwms.supervisor
+
 /usr/local/sbin/consul:
   file.managed:
     - source: salt://items/consul/files/consul
@@ -10,9 +13,3 @@
     - makedirs: True
     - require:
       - file: /usr/local/sbin/consul
-
-supervisor:
-  pkg.installed: {}
-  service.running:
-    - require:
-      - pkg: supervisor
