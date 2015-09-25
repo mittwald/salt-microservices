@@ -135,7 +135,7 @@ def run():
 
     config["/etc/haproxy/haproxy.cfg"] = {
         "file.managed": [
-            {"source": "salt://items/mw-microservices/files/haproxy.conf.j2"}
+            {"source": "salt://mwms/files/haproxy.conf.j2"}
         ]
     }
 
