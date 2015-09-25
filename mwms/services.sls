@@ -123,7 +123,7 @@ def run():
             config["/etc/consul/service-%s.json" % service_name] = {
                 "file.managed": [
                     {"contents": json.dumps({"service": consul_service}, indent=4)},
-                    {"watch_in": [{"cmd": "consul-server-reload"}]}
+                    {"watch_in": [{"cmd": "consul-reload"}]}
                 ]
             }
 
