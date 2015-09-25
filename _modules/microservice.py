@@ -7,7 +7,7 @@ logger = logging.getLogger(__name__)
 
 def redeploy(service_name, tag_override='latest'):
     try:
-        service_definition = salt['pillar.get']('microservices:%s' % service_name)
+        service_definition = __salt__['pillar.get']('microservices:%s' % service_name)
     except KeyError:
         return {
             "result": True,
@@ -27,8 +27,8 @@ def redeploy(service_name, tag_override='latest'):
         if ':' not in image_name:
             image_name += ":%s" % tag_override
 
-        salt['mwdocker.pull_image'](image_name, force=True)
-        current_image_id = salt['mwdocker.image_id'](image_name)
+        __salt__['mwdocker.pull_image'](image_name, force=True)
+        current_image_id = __salt__['mwdocker.image_id'](image_name)
 
         for container_number in range(container_config['instances']):
             container_name = "%s-%s-%d" % (service_name, key, container_number)
@@ -57,7 +57,7 @@ def redeploy(service_name, tag_override='latest'):
                     result["container_ids"][container_name]["new"] = None
                     continue
                 logger.info("Deleting container %s" % container_name)
-                salt['mwdocker.delete_container'](container_name)
+                __salt__['mwdocker.delete_container'](container_name)
 
             links = {}
             if 'links' in container_config:
@@ -81,7 +81,7 @@ def redeploy(service_name, tag_override='latest'):
             elif 'ports' in container_config:
                 ports += container_config['ports']
 
-            container_id = salt['mwdocker.create_container'](
+            container_id = __salt__['mwdocker.create_container'](
                 name=container_name,
                 image=image_name,
                 environment=container_config["environment"] if "environment" in container_config else None,
@@ -93,12 +93,12 @@ def redeploy(service_name, tag_override='latest'):
                 restart=container_config["restart"] if "restart" in container_config else True,
                 user=container_config["user"] if "user" in container_config else None,
                 command=container_config["command"] if "command" in container_config else None,
-                dns=[salt['grains.get']('ip4_interfaces:eth0')[0]],
+                dns=[__salt__['grains.get']('ip4_interfaces:eth0')[0]],
                 domain="consul"
             )
             result["container_ids"][container_name]["new"] = container_id
 
-            salt['mwdocker.start_container'](container_name)
+            __salt__['mwdocker.start_container'](container_name)
             logger.info("Created container %s with id %s" % (container_name, container_id))
 
 
