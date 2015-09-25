@@ -11,7 +11,7 @@ def run():
         ".backup"
     ]
 
-    dns_ip = __grains__['ip4_interfaces']['eth0'][0]
+    dns_ip = salt['grain.get']('ip4_interfaces:eth0')[0]
     for service_name, service_config in service_definitions.items():
         for key, container_config in service_config['containers'].items():
             container_name = "%s-%s" % (service_name, key)
