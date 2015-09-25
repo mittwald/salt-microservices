@@ -37,7 +37,7 @@ def run():
                     {"image": container_config['docker_image']},
                     {"stateful": container_config["stateful"]},
                     {"dns": [dns_ip]},
-                    {"domain": "%s.consul" % __grains__["coab_context"]},
+                    {"domain": "consul"},
                     {"watch_in": [{"file": "/etc/haproxy/haproxy.cfg"}]}
                 ]
 
