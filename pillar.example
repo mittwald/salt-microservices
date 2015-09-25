@@ -18,3 +18,32 @@ consul:
       checks:
         - http: http://webservice.example.com
           interval: 5m
+
+microservices:
+  example:
+    hostname: example.services.acme.co
+    containers:
+      web:
+        instances: 2
+        docker_image: docker-registry.acme.co/services/example:latest
+        stateful: False
+        http: True
+        http_internal_port: 8000
+        base_port: 10000
+        links:
+          database: db
+        volumes:
+          - ["persistent", "/var/lib/persistent-app-data", "rw"]
+        environment:
+          DATABASE_PASSWORD: supersecret
+      db:
+        instances: 1
+        docker_image: mariadb:10
+        stateful: True
+        volumes:
+          - ["database", "/var/lib/mysql", "rw"]
+        environment:
+          MYSQL_ROOT_PASSWORD: supersupersecret
+          MYSQL_PASSWORD: supersecret
+          MYSQL_USER: myapp
+          MYSQL_DATABASE: myapp
