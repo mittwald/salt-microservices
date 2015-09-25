@@ -72,7 +72,9 @@ Requirements
     library, you'll need an older version of that package (actually tested with
     1.2.3). Easiest way to install this package is using *pip*:
 
-        $ pip install docker-py==1.2.3
+    ```shellsession
+    $ pip install docker-py==1.2.3
+    ```
 
     Alternatively, use the following Salt states to install docker-py:
 
@@ -89,13 +91,15 @@ Requirements
 Installation
 ------------
 
-See the [official documentation](https://docs.saltstack.com/en/latest/topics/development/conventions/formulas.html)
-on how to use formulas in your Salt setup. Assuming you have *GitFS* set up and
-configured on your Salt master, simply configure this repository as a GitFS
-remote in your Salt configuration file (typically `/etc/salt/master`):
+See the [official documentation][salt-formulas] on how to use formulas in your
+Salt setup. Assuming you have *GitFS* set up and configured on your Salt master,
+simply configure this repository as a GitFS remote in your Salt configuration
+file (typically `/etc/salt/master`):
 
-    gitfs_remotes:
-      - https://github.com/mittwald/salt-microservices
+```yaml
+gitfs_remotes:
+  - https://github.com/mittwald/salt-microservices
+```
 
 To quote a very important warning from the official documentation:
 
@@ -111,10 +115,10 @@ Using the microservice states
 
 ### Setting up the Salt mine
 
-This formula uses the [Salt mine](https://docs.saltstack.com/en/stage/topics/mine/index.html)
-feature to discover servers in the infrastructure. Specifically, the
-`network.ip_addrs` function needs to be callable as a mine function. For this,
-ensure that the following pillar is set for all servers of your infrastructure:
+This formula uses the [Salt mine][salt-mine] feature to discover servers in the
+infrastructure. Specifically, the `network.ip_addrs` function needs to be
+callable as a mine function. For this, ensure that the following pillar is set
+for all servers of your infrastructure:
 
 ```yaml
 mine_functions:
@@ -127,7 +131,7 @@ mine_functions:
 You need at least one Consul server in your cluster (althoug a number of three
 or five should be used in production for a high-availability setup).
 
-First of all, you need to configure a [targeting expression](https://docs.saltstack.com/en/latest/topics/targeting/index.html)
+First of all, you need to configure a [targeting expression][salt-targeting]
 that can be used to match your consul servers. The default expression will
 simply match the minion ID against the pattern `consul-server*`. Use the pillar
 `consul:server_pattern` for this:
@@ -164,7 +168,7 @@ You can use the `mwms.consul.agent` state for this. Furthermore, use the
 
 # Deploying services
 
-## Example
+## Defining services
 
 Services that should be deployed in your infrastructure are defined using
 Salt pillars.
@@ -213,8 +217,25 @@ service-node-002:
 
 **Note**: Yes, you need to distribute services manually to your hosts. Yes, this
 is done on purpose to offer a low-complexity solution for small-scale
-architectures. If you want more, use [Kubernetes](http://kubernetes.io/) or
-[Marathon](https://mesosphere.github.io/marathon/).
+architectures. If you want more, use [Kubernetes][kubernetes] or
+[Marathon][marathon].
+
+## Updating existing services
+
+For updating existing services, you can use the `microservice.redeploy` Salt
+module. This module will try to pull a newer version of the image that the
+application containers were created from. If a newer image exists, this module
+will delete and re-create the containers from the newer image:
+
+```shellsession
+$ salt-call microservice.redeploy example
+```
+
+This is done sequentially and with a grace time of 60 seconds. If your service
+consists of more than one instance of the same container, the deployment will
+not cause ~~any~~ significant downtime.
+
+# Reference
 
 ## Configuration reference
 
@@ -302,9 +323,50 @@ You can use the following configuration options for each container:
 
 *   `environment`: A map of environment variables to set for this container.
     **Note:** When using this feature for setting confidential data like API
-    tokens or passwords, consider using [Salt's GPG encryption features](https://docs.saltstack.com/en/stage/ref/renderers/all/salt.renderers.gpg.html).
+    tokens or passwords, consider using [Salt's GPG encryption features][salt-gpg].
 
 ## State reference
 
--   `mwms.consul.dns`: Configures a node to use the Consul servers as DNS
-    server. This is done by placing a custom `resolv.conf` file.
+### `mwms.consul.server` and `mwms.consul.agent`
+
+These states install a Consul server or agent on a node. The Consul version that
+is installed is shipped statically with this formula. The Consul agent will be
+run using the [Supervisor process manager][supervisor]
+
+### `mwms.consul.dns`
+
+Configures a node to use the Consul servers as DNS server. This is done by
+placing a custom `resolv.conf` file.
+
+### `mwms.services`
+
+This states read the `microservice` pillar (see above) and defines the necessary
+states for operating the application containers for these services. This will
+include the following:
+
+1. Creating as many Docker containers as defined in the pillar
+2. Adjusting the HAProxy configuration to make your services accessible to the
+   world.
+3. Configure maintenance cron jobs for each service as defined in the pillar.
+   These will be run in temporary docker containers.
+
+## Module reference
+
+### `microservice.redeploy`
+
+This module will re-deploy a microservice. This module will try to pull a newer
+version of the image that the application containers were created from. If a
+newer image exists, this module will delete and re-create the containers from
+the newer image.
+
+This is done sequentially and with a grace time of 60 seconds. If your service
+consists of more than one instance of the same container, the deployment will
+not cause ~~any~~ significant downtime.
+
+[kubernetes]: http://kubernetes.io/
+[marathon]: https://mesosphere.github.io/marathon/
+[salt-fomulas]: https://docs.saltstack.com/en/latest/topics/development/conventions/formulas.html
+[salt-gpg]: https://docs.saltstack.com/en/stage/ref/renderers/all/salt.renderers.gpg.html
+[salt-mine]: https://docs.saltstack.com/en/stage/topics/mine/index.html
+[salt-targeting]: https://docs.saltstack.com/en/latest/topics/targeting/index.html
+[supervisor]: http://supervisord.org/
