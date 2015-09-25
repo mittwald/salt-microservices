@@ -64,7 +64,7 @@ def run():
         "consul-reload": {
             "module.wait": [
                 {"name": "consul.reload"},
-                {"watch": [{"file": "/etc/consul/agent.json"}]}
+                {"watch": [{"file": "/etc/consul/server.json"}]}
             ]
         }
     }
