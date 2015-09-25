@@ -8,7 +8,8 @@ def run():
     service_definitions = salt['pillar.get']('microservices')
 
     config["include"] = [
-        ".backup"
+        ".backup",
+        "mwms.haproxy"
     ]
 
     dns_ip = salt['grain.get']('ip4_interfaces:eth0')[0]
@@ -127,13 +128,10 @@ def run():
                 ]
             }
 
-    config["include"].append("items.haproxy")
-    config["extend"] = {
-        "/etc/haproxy/haproxy.cfg": {
-            "file": [
-                {"source": "salt://items/mw-microservices/files/haproxy.conf.j2"}
-            ]
-        }
+    config["/etc/haproxy/haproxy.cfg"] = {
+        "file.managed": [
+            {"source": "salt://items/mw-microservices/files/haproxy.conf.j2"}
+        ]
     }
 
     return config
