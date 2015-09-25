@@ -29,11 +29,6 @@ def run():
             "mwms.consul.common.install",
             "mwms.supervisor"
         ],
-        "/etc/resolv.conf": {
-            "file.managed": [
-                {"source": "salt://consul/files/agent-resolv.conf"}
-            ]
-        },
         "/etc/consul/server.json": {
             "file.managed": [
                 {"contents": json.dumps(consul_client_config, indent=4)},

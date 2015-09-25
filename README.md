@@ -303,3 +303,8 @@ You can use the following configuration options for each container:
 *   `environment`: A map of environment variables to set for this container.
     **Note:** When using this feature for setting confidential data like API
     tokens or passwords, consider using [Salt's GPG encryption features](https://docs.saltstack.com/en/stage/ref/renderers/all/salt.renderers.gpg.html).
+
+## State reference
+
+-   `mwms.consul.dns`: Configures a node to use the Consul servers as DNS
+    server. This is done by placing a custom `resolv.conf` file.
