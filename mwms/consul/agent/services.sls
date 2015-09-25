@@ -1,4 +1,10 @@
-# {% set services = salt['pillar.get']('consul:services', {}) %}
+# Copyright (c) 2015 Martin Helmich <m.helmich@mittwald.de>
+#                    Mittwald CM Service GmbH & Co. KG
+#
+# Docker-based microservice deployment with service discovery
+# This code is MIT-licensed. See the LICENSE.txt for more information
+
+{% set services = salt['pillar.get']('consul:services', {}) %}
 
 {% for service_name, service_config in services %}
 {% set consul_service_definition = {"service": service_config} %}

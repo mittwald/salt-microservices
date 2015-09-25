@@ -1,8 +1,24 @@
+# Copyright (c) 2015 Martin Helmich <m.helmich@mittwald.de>
+#                    Mittwald CM Service GmbH & Co. KG
+#
+# Docker-based microservice deployment with service discovery
+# This code is MIT-licensed. See the LICENSE.txt for more information
+
 
 import requests
 import json
 
 def node(name, address, datacenter=None, service=None):
+    """
+    This state registers a new external node using the Consul REST API.
+
+    [1] https://www.consul.io/docs/agent/http/catalog.html#catalog_register
+
+    :param name: The node name
+    :param address: A resolvable address (IP address or hostname) under which the node can be reached
+    :param datacenter: The data center name
+    :param service: A Consul service definition (see [1] for more information)
+    """
     r = requests.get('http://localhost:8500/v1/catalog/node/%s' % name)
     repr = {
         "Node": name,

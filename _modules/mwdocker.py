@@ -1,3 +1,10 @@
+# Copyright (c) 2015 Martin Helmich <m.helmich@mittwald.de>
+#                    Mittwald CM Service GmbH & Co. KG
+#
+# Docker-based microservice deployment with service discovery
+# This code is MIT-licensed. See the LICENSE.txt for more information
+
+
 try:
     import docker
     import docker.utils
@@ -15,18 +22,40 @@ log = logging.getLogger(__name__)
 
 
 def container_ip(name):
+    """
+    Determines the internal IP address of a Docker container.
+
+    :param name: The container name
+    :return: The container's internal IP address
+    """
     client = docker.Client(base_url='unix://var/run/docker.sock')
     info = client.inspect_container(name)
     return info['NetworkSettings']['IPAddress']
 
 
 def container_published_port(name, container_port):
+    """
+    Gets the port number of a publicly exposed container port.
+
+    :param name: The container name
+    :param int: The internal container port
+    :return: The host port that the container port is mapped on
+    """
     client = docker.Client(base_url='unix://var/run/docker.sock')
     info = client.inspect_container(name)
     return info['NetworkSettings']['Ports'][container_port]['HostPort']
 
 
 def start_container(name, warmup_wait=60):
+    """
+    Starts a Docker container. This function will wait for a defined amount of
+    time to check if the container actually stays up after being started. If the
+    container status is not "up" after the `warmup_wait` has expired, this
+    function will raise an exception.
+
+    :param name: The container name
+    :param int: How long this function should wait to check the container status
+    """
     log.info("Starting container %s" % name)
     client = docker.Client(base_url='unix://var/run/docker.sock')
     client.start(name)
@@ -43,6 +72,12 @@ def start_container(name, warmup_wait=60):
 
 
 def image_id(image):
+    """
+    Gets the image ID for a specified image name.
+
+    :param image: The image name
+    :return: The image ID
+    """
     if ':' not in image:
         image += ":latest"
 
@@ -56,6 +91,11 @@ def image_id(image):
 
 
 def delete_container(name):
+    """
+    Stops and deletes a container.
+
+    :param name: Name of the container to delete
+    """
     log.info("Deleting container %s" % name)
     client = docker.Client(base_url='unix://var/run/docker.sock')
 
@@ -71,6 +111,29 @@ def delete_container(name):
 
 def create_container(name, image, command=None, environment=None, volumes=(), udp_ports=None, tcp_ports=None,
                      restart=True, dns=None, domain=None, volumes_from=None, links=None, user=None, test=False):
+    """
+    Creates a new container.
+
+    :param name: The container name
+    :param image: The image from which to create the container
+    :param command: The command to use for the container
+    :param environment: A dictionary of environment variables to pass into the
+        container
+    :param volumes: A list of volumes. Each volume definition is a string of the
+        format "<host-directory>:<container-directory>:<rw|ro>"
+    :param udp_ports: UDP ports to expose. This is a list of dictionaries that
+        must provide a "port" and an "address" key.
+    :param tcp_ports: TCP ports to expose. This is a list of dictionaries that
+        must provide a "port" and an "address" key.
+    :param restart: `True` to restart the container when it stops
+    :param dns: A list of DNS server addresses to use
+    :param domain: The DNS search domain
+    :param volumes_from: A list of container names from which to use the volumes
+    :param links: A dictionary of containers to link (using the container name
+        as index and the alias as value)
+    :param user: The user under which to start the container
+    :param test: Set to `True` to not actually do anything
+    """
 
     client = docker.Client(base_url='unix://var/run/docker.sock')
 
@@ -78,8 +141,6 @@ def create_container(name, image, command=None, environment=None, volumes=(), ud
 
     hostconfig_ports, ports = _create_port_definitions(udp_ports, tcp_ports)
     hostconfig_binds, binds = _create_volume_definitions(volumes)
-
-    print(hostconfig_binds)
 
     restart_policy = None
     if restart:
@@ -117,6 +178,13 @@ def create_container(name, image, command=None, environment=None, volumes=(), ud
 
 
 def pull_image(image, force=False, test=False):
+    """
+    Pulls the current version of an image.
+
+    :param image: The image name. If no tag is specified, the `latest` tag is assumed
+    :param force: Set to `True` to pull even when a local image of the same name exists
+    :param test: Set to `True` to not actually do anything
+    """
     client = docker.Client(base_url='unix://var/run/docker.sock')
 
     if ':' not in image:

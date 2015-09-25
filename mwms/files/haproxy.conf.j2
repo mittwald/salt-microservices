@@ -1,0 +1,63 @@
+global
+    log 127.0.0.1 daemon err
+    chroot /var/lib/haproxy
+    stats socket /run/haproxy/admin.sock mode 660 level admin
+    stats timeout 30s
+    user haproxy
+    group haproxy
+    ca-base /etc/ssl/certs
+    crt-base /etc/ssl/private
+    ssl-default-bind-ciphers kEECDH+aRSA+AES:kRSA+AES:+AES256:RC4-SHA:!kEDH:!LOW:!EXP:!MD5:!aNULL:!eNULL
+    ssl-default-bind-options no-sslv3
+    daemon
+    maxconn 8192
+
+defaults
+    log     global
+    mode    http
+    option  dontlognull
+    timeout connect 180s
+    timeout client 180s
+    timeout server 180s
+    errorfile 400 /etc/haproxy/errors/400.http
+    errorfile 403 /etc/haproxy/errors/403.http
+    errorfile 408 /etc/haproxy/errors/408.http
+    errorfile 500 /etc/haproxy/errors/500.http
+    errorfile 502 /etc/haproxy/errors/502.http
+    errorfile 503 /etc/haproxy/errors/503.http
+    errorfile 504 /etc/haproxy/errors/504.http
+
+{%- set service_definitions = salt['pillar.get']('microservices') %}
+
+frontend http_in
+    bind *:80
+    mode http
+    option  httplog
+    reqadd X-Forwarded-Proto:\ http
+
+{%- for service_name, service_config in service_definitions.items() %}
+{%- for key, container_config in service_config.containers | dictsort if container_config['http'] is defined %}
+    acl is_service_{{ service_name }}_{{ key }} hdr_end(host) -i {{ service_config['hostname'] }}
+    acl is_service_{{ service_name }}_{{ key }} hdr_end(host) -i {{ service_name }}.service.consul
+{%- endfor %}
+{%- endfor %}
+
+{% for service_name, service_config in service_definitions.items() %}
+{%- for key, container_config in service_config.containers | dictsort if container_config['http'] is defined %}
+    use_backend {{ service_name }}_{{ key }} if is_service_{{ service_name }}_{{ key }}
+{%- endfor %}
+{% endfor %}
+
+{%- for service_name, service_config in service_definitions.items() %}
+{%- for key, container_config in service_config.containers | dictsort if container_config['http'] is defined %}
+backend {{ service_name }}_{{ key }}
+    balance roundrobin
+    cookie SERVERID
+    option httpclose
+    option forwardfor
+{%- for container_number in range(container_config['instances']) -%}
+{%- set container_instance_name = service_name ~ "-" ~ key ~ "-" ~ container_number %}
+    server {{ container_instance_name }} localhost:{{ container_config['base_port'] + container_number }} cookie
+{%- endfor %}
+{%- endfor %}
+{% endfor %}

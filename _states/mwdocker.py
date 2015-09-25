@@ -1,3 +1,10 @@
+# Copyright (c) 2015 Martin Helmich <m.helmich@mittwald.de>
+#                    Mittwald CM Service GmbH & Co. KG
+#
+# Docker-based microservice deployment with service discovery
+# This code is MIT-licensed. See the LICENSE.txt for more information
+
+
 import docker.errors
 import docker
 import logging
@@ -15,6 +22,26 @@ if not '__salt__' in globals():
 
 def running(name, image, volumes=(), restart=True, tcp_ports=(), udp_ports=(), environment=None, command=None, dns=None,
             domain=None, volumes_from=None, links=None, user=None, warmup_wait=60, stateful=False):
+    """
+    Asserts that a container matching the provided specification is up and
+    running.
+
+    :param name: The container name
+    :param image: The image from which to create the container
+    :param volumes: A list of volumes. Each volume definition is a string of the format "<host-directory>:<container-directory>:<rw|ro>"
+    :param restart: `True` to restart the container when it stops
+    :param tcp_ports: TCP ports to expose. This is a list of dictionaries that must provide a "port" and an "address" key
+    :param udp_ports: UDP ports to expose. This is a list of dictionaries that must provide a "port" and an "address" key
+    :param environment: A dictionary of environment variables to pass into the container
+    :param command: The command to use for the container
+    :param dns: A list of DNS server addresses to use
+    :param domain: The DNS search domain
+    :param volumes_from: A list of container names from which to use the volumes
+    :param links: A dictionary of containers to link (using the container name as index and the alias as value)
+    :param user: The user under which to start the container
+    :param warmup_wait: The amount of time to wait for the container to start
+    :param stateful: Set to `True` to prevent this container from automatic deletion
+    """
     ret = {
         'name': name,
         'result': True,

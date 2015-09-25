@@ -1,3 +1,9 @@
+# Copyright (c) 2015 Martin Helmich <m.helmich@mittwald.de>
+#                    Mittwald CM Service GmbH & Co. KG
+#
+# Docker-based microservice deployment with service discovery
+# This code is MIT-licensed. See the LICENSE.txt for more information
+
 import logging
 import docker
 import docker.errors
@@ -6,6 +12,17 @@ logger = logging.getLogger(__name__)
 
 
 def redeploy(service_name, tag_override='latest'):
+    """
+    Re-deploys a service. This module tries to pull the Docker image from which
+    an application container is created. If a newer version of the image could
+    be pulled, this module will sequentially delete the containers and re-create
+    them.
+
+    :param service_name: The name of the service to re-deploy
+    :param tag_override: The default tag to use (if no image tag was specified)
+        in the service definition pillar.
+    """
+
     try:
         service_definition = __salt__['pillar.get']('microservices:%s' % service_name)
     except KeyError:

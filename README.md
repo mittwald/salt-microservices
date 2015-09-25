@@ -325,7 +325,7 @@ You can use the following configuration options for each container:
     **Note:** When using this feature for setting confidential data like API
     tokens or passwords, consider using [Salt's GPG encryption features][salt-gpg].
 
-## State reference
+## SLS reference
 
 ### `mwms.consul.server` and `mwms.consul.agent`
 
@@ -350,6 +350,30 @@ include the following:
 3. Configure maintenance cron jobs for each service as defined in the pillar.
    These will be run in temporary docker containers.
 
+## State reference
+
+### `consul.node`
+
+This state registers a new external node using the Consul REST API. This state
+requires Consul to be already installed on the node (use one of the
+`mwms.consul.*` SLSes for that) and requires the Python [requests][py-requests]
+package.
+
+Example:
+
+```yaml
+external-node:
+  consul.node:
+    - address: url-to-external.service.acme.com
+    - datacenter: dc1
+    - service:
+        ID: example
+        Port: 80
+        Tags:
+          - master
+          - v1
+```
+
 ## Module reference
 
 ### `microservice.redeploy`
@@ -365,6 +389,7 @@ not cause ~~any~~ significant downtime.
 
 [kubernetes]: http://kubernetes.io/
 [marathon]: https://mesosphere.github.io/marathon/
+[py-requests]: http://www.python-requests.org/en/latest/
 [salt-fomulas]: https://docs.saltstack.com/en/latest/topics/development/conventions/formulas.html
 [salt-gpg]: https://docs.saltstack.com/en/stage/ref/renderers/all/salt.renderers.gpg.html
 [salt-mine]: https://docs.saltstack.com/en/stage/topics/mine/index.html
