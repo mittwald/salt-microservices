@@ -390,7 +390,7 @@ not cause ~~any~~ significant downtime.
 [kubernetes]: http://kubernetes.io/
 [marathon]: https://mesosphere.github.io/marathon/
 [py-requests]: http://www.python-requests.org/en/latest/
-[salt-fomulas]: https://docs.saltstack.com/en/latest/topics/development/conventions/formulas.html
+[salt-formulas]: https://docs.saltstack.com/en/latest/topics/development/conventions/formulas.html
 [salt-gpg]: https://docs.saltstack.com/en/stage/ref/renderers/all/salt.renderers.gpg.html
 [salt-mine]: https://docs.saltstack.com/en/stage/topics/mine/index.html
 [salt-targeting]: https://docs.saltstack.com/en/latest/topics/targeting/index.html
