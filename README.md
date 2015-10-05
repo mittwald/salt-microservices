@@ -68,12 +68,12 @@ Requirements
     you happen to be running.
 
 -   You need the [docker-py](https://github.com/docker/docker-py) Python library.
-    Because current versions of Salt do not work with the 1.3 version of this
-    library, you'll need an older version of that package (actually tested with
-    1.2.3). Easiest way to install this package is using *pip*:
+    The Docker states in this repository require at least version 1.3 of this
+    library (tested with 1.3.1). The easiest way to install this package is
+    using *pip*:
 
     ```shellsession
-    $ pip install docker-py==1.2.3
+    $ pip install "docker-py>=1.3.0,<1.4.0"
     ```
 
     Alternatively, use the following Salt states to install docker-py:
@@ -83,7 +83,7 @@ Requirements
       pkg.installed: []
     docker-py:
       pip.installed:
-        - name: docker-py==1.2.3
+        - name: docker-py>=1.3.0,<1.4.0
         - require:
           - pkg: pip
     ```
