@@ -8,9 +8,11 @@
 
 import json
 
+
 def run():
     consul_server_pattern = salt['pillar.get']('consul:server_pattern', 'consul-server*')
     consul_data_dir = salt['pillar.get']('consul:data_dir', '/var/lib/consul/data')
+    consul_config_dir = salt['pillar.get']('consul:config_dir', '/etc/consul')
 
     consul_client_config = {
         "data_dir": consul_data_dir,
@@ -45,7 +47,10 @@ def run():
             "file.managed": [
                 {"source": "salt://consul/files/supervisor-client.conf"},
                 {"template": "jinja"},
-                {"context": {"consul_data_dir": consul_data_dir}},
+                {"context": {
+                    "consul_data_dir": consul_data_dir,
+                    "consul_config_dir": consul_config_dir
+                }},
                 {"watch_in": [
                     {"service": "supervisor"}
                 ]},

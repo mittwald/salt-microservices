@@ -1,6 +1,7 @@
 consul:
   data_dir: /var/lib/consul/data
   ui_dir: /var/lib/consul/ui
+  config_dir: /etc/consul
   datacenter: dc1
   nameservers:
     - 8.8.8.8
