@@ -8,10 +8,12 @@
 
 import json
 
+
 def run():
     consul_server_pattern = salt['pillar.get']('consul:server_pattern', 'consul-server*')
     consul_data_dir = salt['pillar.get']('consul:data_dir', '/var/lib/consul/data')
     consul_ui_dir = salt['pillar.get']('consul:ui_dir', '/var/lib/consul/ui')
+    consul_config_dir = salt['pillar.get']('consul:config_dir', '/etc/consul')
 
     peers = salt['mine.get'](consul_server_pattern, 'network.ip_addrs').items()
 
@@ -54,7 +56,8 @@ def run():
                 {"template": "jinja"},
                 {"context": {
                     "consul_data_dir": consul_data_dir,
-                    "consul_ui_dir": consul_ui_dir
+                    "consul_ui_dir": consul_ui_dir,
+                    "consul_config_dir": consul_config_dir
                 }},
                 {"watch_in": [
                     {"service": "supervisor"}
