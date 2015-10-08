@@ -12,7 +12,7 @@ include:
 
 /usr/local/sbin/consul:
   file.managed:
-    - source: salt://items/consul/files/consul
+    - source: salt://mwms/consul/files/consul
     - mode: '0755'
 
 '{{ consul_data_dir }}':
