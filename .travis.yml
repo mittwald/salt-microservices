@@ -7,7 +7,13 @@ before_install:
   - docker pull bbinet/salt-master
 
 install:
-  - docker run -d --name salt-master -v $PWD:/data bbinet/salt-master
+  - cp test/top.sls .
+  - docker run -d --name salt-master -v $PWD:/data -v $PWD/test/config:/config bbinet/salt-master
+  - docker run -d --name consul-server01 -h consul-server01 --link salt-master:salt bbinet/salt-minion:wheezy
+  - docker run -d --name servicehost01 -h servicehost01 --link salt-master:salt bbinet/salt-minion:wheezy
+  - sleep 10
+  - docker exec salt-master salt-key -Ay
 
 script:
-  - docker run --name consul-server01 -h consul-server01 --link salt-master:salt bbinet/salt-minion:wheezy salt-call state.highstate test=True
+  - docker exec consul-server01 salt-call --retcode-passthrough state.highstate test=True
+  - docker exec servicehost01 salt-call --retcode-passthrough state.highstate test=True
