@@ -1,6 +1,8 @@
 Deploying microservice architectures with Salt
 ==============================================
 
+[![Build Status](https://travis-ci.org/mittwald/salt-microservices.svg?branch=master)](https://travis-ci.org/mittwald/salt-microservices)
+
 Author and copyright
 --------------------
 
