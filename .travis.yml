@@ -12,6 +12,8 @@ install:
   - docker run -d --name consul-server01 -h consul-server01 --link salt-master:salt bbinet/salt-minion:wheezy
   - docker run -d --name servicehost01 -h servicehost01 --link salt-master:salt bbinet/salt-minion:wheezy
   - sleep 10
+  - docker ps
+  - docker exec salt-master salt-key -L
   - docker exec salt-master salt-key -Ay
 
 script:
