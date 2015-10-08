@@ -9,3 +9,7 @@ haproxy:
   service.running:
     - enable: True
     - state: running
+    - onlyif:
+      - dpkg -l | grep -q haproxy
+    - require:
+      - pkg: haproxy

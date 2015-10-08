@@ -10,7 +10,7 @@ import json
 
 def run():
     config = {}
-    service_definitions = salt['pillar.get']('microservices')
+    service_definitions = salt['pillar.get']('microservices', {})
 
     config["include"] = [
         ".backup",
