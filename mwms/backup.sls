@@ -10,7 +10,7 @@ import json
 
 def run():
     config = {}
-    service_definitions = salt['pillar.get']('microservices')
+    service_definitions = salt['pillar.get']('microservices', {})
 
     for service_name, service_config in service_definitions.items():
         for key, container_config in service_config['containers'].items():

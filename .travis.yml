@@ -1,0 +1,26 @@
+sudo: required
+services:
+  - docker
+
+before_install:
+  - docker pull bbinet/salt-minion:wheezy
+  - docker pull bbinet/salt-master
+
+install:
+  - cp test/top.sls .
+  - docker run --privileged -d --name salt-master -v $PWD:/data -v $PWD/test/config:/config bbinet/salt-master
+  - docker run --privileged -d --name consul-server01 -h consul-server01 --link salt-master:salt bbinet/salt-minion:wheezy
+  - docker run --privileged -d --name servicehost01 -h servicehost01 --link salt-master:salt bbinet/salt-minion:wheezy
+  - while [ $(docker exec salt-master salt-key -l unaccepted | wc -l) -lt 3 ] ; do sleep 10 ; done
+  - docker ps
+  - docker exec salt-master salt-key -L
+  - docker exec salt-master salt-key -Ay
+
+script:
+  - docker exec consul-server01 salt-call state.highstate test=True &> consul.log && grep -q 'Failed:[ ]\+0' consul.log
+  - docker exec servicehost01 salt-call state.highstate test=True &> service.log && grep -q 'Failed:[ ]\+0' service.log
+
+after_failure:
+  - cat consul.log
+  - cat service.log
+  - docker logs salt-master
