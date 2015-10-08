@@ -17,5 +17,5 @@ install:
   - docker exec salt-master salt-key -Ay
 
 script:
-  - docker exec consul-server01 salt-call state.highstate test=True | grep -q 'Failed:[ ]\+0'
-  - docker exec servicehost01 salt-call state.highstate test=True | grep -q 'Failed:[ ]\+0'
+  - docker exec consul-server01 salt-call state.highstate test=True &> consul.log && grep -q 'Failed:[ ]\+0' consul.log || { cat consul.log && false ; }
+  - docker exec servicehost01 salt-call state.highstate test=True &> service.log && grep -q 'Failed:[ ]\+0' service.log || { cat service.log && false ; }
