@@ -45,7 +45,7 @@ def run():
         },
         "/etc/supervisor/conf.d/consul.conf": {
             "file.managed": [
-                {"source": "salt://consul/files/supervisor-client.conf"},
+                {"source": "salt://mwms/consul/files/supervisor-agent.conf"},
                 {"template": "jinja"},
                 {"context": {
                     "consul_data_dir": consul_data_dir,
