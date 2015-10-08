@@ -15,6 +15,8 @@ install:
   - docker ps
   - docker exec salt-master salt-key -L
   - docker exec salt-master salt-key -Ay
+  - sleep 5
+  - docker exec salt-master salt '*' saltutil.sync_all
 
 script:
   - docker exec consul-server01 salt-call --retcode-passthrough state.highstate test=True
