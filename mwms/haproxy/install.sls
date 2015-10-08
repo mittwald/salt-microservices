@@ -5,7 +5,7 @@
 # This code is MIT-licensed. See the LICENSE.txt for more information
 
 haproxy:
-  pkg.installed: []
+  pkg.installed123: []
   service.running:
     - enable: True
     - state: running
