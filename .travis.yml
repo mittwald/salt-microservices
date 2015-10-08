@@ -10,4 +10,4 @@ install:
   - docker run -d --name salt-master -v $PWD:/data bbinet/salt-master
 
 script:
-  - docker run --name consul-server01 -h consul-server01 --link salt-master:salt-master bbinet/salt-minion:wheezy salt-call state.highstate test=True
+  - docker run --name consul-server01 -h consul-server01 --link salt-master:salt bbinet/salt-minion:wheezy salt-call state.highstate test=True
