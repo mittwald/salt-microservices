@@ -136,7 +136,10 @@ def run():
     config["/etc/haproxy/haproxy.cfg"] = {
         "file.managed": [
             {"source": "salt://mwms/haproxy/files/haproxy.conf.j2"},
-            {"template": "jinja"}
+            {"template": "jinja"},
+            {"watch_in": [
+                {"service": "haproxy"}
+            ]}
         ]
     }
 
