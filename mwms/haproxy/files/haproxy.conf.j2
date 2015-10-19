@@ -27,7 +27,7 @@ defaults
     errorfile 503 /etc/haproxy/errors/503.http
     errorfile 504 /etc/haproxy/errors/504.http
 
-{%- set service_definitions = salt['pillar.get']('microservices') %}
+{%- set service_definitions = salt['pillar.get']('microservices', {}) %}
 
 frontend http_in
     bind *:80
