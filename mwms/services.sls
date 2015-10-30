@@ -14,7 +14,7 @@ def run():
 
     config["include"] = [
         ".backup",
-        "mwms.haproxy"
+        ".nginx"
     ]
 
     dns_ip = salt['grains.get']('ip4_interfaces:eth0')[0]
@@ -133,14 +133,39 @@ def run():
                 ]
             }
 
-    config["/etc/haproxy/haproxy.cfg"] = {
-        "file.managed": [
-            {"source": "salt://mwms/haproxy/files/haproxy.conf.j2"},
-            {"template": "jinja"},
-            {"watch_in": [
-                {"service": "haproxy"}
-            ]}
-        ]
-    }
+        if has_http:
+            config["/etc/nginx/sites-available/service_%s.conf" % service_name] = {
+                "file.managed": [
+                    {"source": "salt://mwms/nginx/files/vhost.j2"},
+                    {"template": "jinja"},
+                    {"context": {
+                        "service_name": service_name,
+                        "service_config": service_config
+                    }},
+                    {"watch_in": [
+                        {"service": "nginx"}
+                    ]}
+                ]
+            }
+
+            config["/etc/nginx/sites-enabled/service_%s.conf" % service_name] = {
+                "file.symlink": [
+                    {"target": "/etc/nginx/sites-available/service_%s.conf" % service_name},
+                    {"require": [
+                        {"file": "/etc/nginx/sites-available/service_%s.conf" % service_name}
+                    ]},
+                    {"watch_in": [{"service": "nginx"}]}
+                ]
+            }
+
+    #config["/etc/haproxy/haproxy.cfg"] = {
+    #    "file.managed": [
+    #        {"source": "salt://mwms/haproxy/files/haproxy.conf.j2"},
+    #        {"template": "jinja"},
+    #        {"watch_in": [
+    #            {"service": "haproxy"}
+    #        ]}
+    #    ]
+    #}
 
     return config

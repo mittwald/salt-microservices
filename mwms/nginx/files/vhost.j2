@@ -1,0 +1,45 @@
+{%- for key, container_config in service_config.containers | dictsort if container_config['http'] is defined %}
+upstream {{ service_name }} {
+{%- for container_number in range(container_config['instances']) -%}
+{%- set container_instance_name = service_name ~ "-" ~ key ~ "-" ~ container_number %}
+  server localhost:{{ container_config['base_port'] + container_number }};
+{%- endfor %}
+}
+{%- endfor %}
+
+server {
+  listen 80;
+
+  server_name {{ service_config["hostname"] }} {{ service_name }}.service.consul;
+
+  location / {
+    proxy_set_header Host $host;
+    proxy_set_header X-Real-IP $remote_addr;
+    proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+    proxy_set_header X-Forwarded-Proto $scheme;
+
+    proxy_pass http://{{ service_name }};
+  }
+}
+
+{% if "ssl_certificate" in service_config %}
+server {
+  listen 443;
+
+  server_name {{ service_config["hostname"] }} {{ service_name }}.service.consul;
+
+  ssl_certificate {{ service_config["ssl_certificate"] }};
+  ssl_certificate_key {{ service_config["ssl_key"] }};
+
+  ssl on;
+
+  location / {
+    proxy_set_header Host $host;
+    proxy_set_header X-Real-IP $remote_addr;
+    proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+    proxy_set_header X-Forwarded-Proto $scheme;
+
+    proxy_pass http://{{ service_name }};
+  }
+}
+{% endif %}
