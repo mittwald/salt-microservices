@@ -257,6 +257,10 @@ A service definition is a YAML object consisting of the following properties:
 *   `containers` (**required**): A map of *container definitions*. Each key of
     this map will be as container name.
 
+*   `ssl_certificate` and `ssl_key` (*optional*): The path to a SSL certificate
+    and the associated private key to use to encrypt the connections to the
+    respective service.
+
 ### Container definition
 
 A container definition is a YAML object consisting of the properties defined
