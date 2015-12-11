@@ -20,7 +20,7 @@ architecture, implementing the following features:
 
 - Container-based deployment
 - Using [Consul](http://consul.io) for service discovery
-- Using [HAProxy](http://www.haproxy.org) for load balancing and service routing
+- Using [NGINX][nginx] for load balancing and service routing
 - Zero-downtime (re)deployment of services using a few custom Salt modules
 
 ![Architecture diagram](docs/architecture.png)
@@ -251,7 +251,7 @@ A service definition is a YAML object consisting of the following properties:
 
 *   `hostname` (**required**): Describes the public hostname used to address
     this service. This especially important when the service exposes a HTTP API
-    or GUI; in this HAProxy will be configured to use this hostname to route
+    or GUI; in this case NGINX  will be configured to use this hostname to route
     requests to respective containers.
 
 *   `containers` (**required**): A map of *container definitions*. Each key of
@@ -285,8 +285,8 @@ You can use the following configuration options for each container:
     and re-create this when a newer version of the image is present.
 
 *   `http` (*default:* `False`): Set to `True` when this container exposes a
-    HTTP service. This will a respective HAProxy configuration to be created to
-    make the service by the public.
+    HTTP service. This will cause a respective NGINX configuration to be created
+    to make the service be accessible by the public.
 
 *   `http_internal_port` (*default:* `80`): Set this property to the port that
     the HTTP service listens on *inside the container*!
@@ -347,7 +347,7 @@ states for operating the application containers for these services. This will
 include the following:
 
 1. Creating as many Docker containers as defined in the pillar
-2. Adjusting the HAProxy configuration to make your services accessible to the
+2. Adjusting the NGINX configuration to make your services accessible to the
    world.
 3. Configure maintenance cron jobs for each service as defined in the pillar.
    These will be run in temporary docker containers.
@@ -391,6 +391,7 @@ not cause ~~any~~ significant downtime.
 
 [kubernetes]: http://kubernetes.io/
 [marathon]: https://mesosphere.github.io/marathon/
+[nginx]: http://nginx.org
 [py-requests]: http://www.python-requests.org/en/latest/
 [salt-formulas]: https://docs.saltstack.com/en/latest/topics/development/conventions/formulas.html
 [salt-gpg]: https://docs.saltstack.com/en/stage/ref/renderers/all/salt.renderers.gpg.html
