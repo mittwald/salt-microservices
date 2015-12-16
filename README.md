@@ -23,7 +23,26 @@ architecture, implementing the following features:
 - Using [NGINX][nginx] for load balancing and service routing
 - Zero-downtime (re)deployment of services using a few custom Salt modules
 
-![Architecture diagram](docs/architecture.png)
+```
+            HTTP (Port 80, 443)  │                     │  HTTP (Port 80, 443)
+      identity.services.acme.co  │                     │  finances.services.acme.co
+                                 ▼                     ▼
+                    ┌───────────────────────────────────────┐                       ┌────────┐
+                    │                 NGINX                 ├──────────────────────►│        │
+                    └────────────┬─────────────────────┬────┘                       │        │
+                                 │                     │                            │        │
+       HTTP (Port 10000)  ┌──────┴───────┐             │  HTTP (Port 10010)         │        │
+identity.services.consul  │              │             │  finances.service.consul   │        │
+                          ▼              ▼             ▼                            │        │
+                    ┌──────────┐   ┌──────────┐   ┌─────────┐                       │ Consul │
+                    │ Identity │   │ Identity │   │ Finance │                       │        │
+                    │ Service  │   │ Service  │   │ Service │                       │        │
+                    └──────────┘   └──────────┘   └─────────┘                       │        │
+                                                                                    │        │
+                    ┌───────────────────────────────────────┐                       │        │
+                    │                 Docker                │                       │        │
+                    └───────────────────────────────────────┘                       └────────┘
+```
 
 Motivation
 ----------
