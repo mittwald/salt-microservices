@@ -134,6 +134,14 @@ def run():
             }
 
         if has_http:
+            config["/var/log/services/%s" % service_name] = {
+                "file.directory": [
+                    {"makedirs": True},
+                    {"user": "www-data"},
+                    {"group": "www-data"}
+                ]
+            }
+
             config["/etc/nginx/sites-available/service_%s.conf" % service_name] = {
                 "file.managed": [
                     {"source": "salt://mwms/nginx/files/vhost.j2"},
@@ -142,9 +150,8 @@ def run():
                         "service_name": service_name,
                         "service_config": service_config
                     }},
-                    {"watch_in": [
-                        {"service": "nginx"}
-                    ]}
+                    {"require": [{"file": "/var/log/services/%s" % service_name}]}
+                    {"watch_in": [{"service": "nginx"}]}
                 ]
             }
 

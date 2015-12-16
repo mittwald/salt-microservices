@@ -12,6 +12,8 @@ server {
 
   server_name {{ service_config["hostname"] }} {{ service_name }}.service.consul;
 
+  access_log /var/log/services/{{ service_name }}/access.log combined;
+
   location / {
     proxy_set_header Host $host;
     proxy_set_header X-Real-IP $remote_addr;
@@ -27,6 +29,8 @@ server {
   listen 443;
 
   server_name {{ service_config["hostname"] }} {{ service_name }}.service.consul;
+
+  access_log /var/log/services/{{ service_name }}/access.log combined;
 
   ssl_certificate {{ service_config["ssl_certificate"] }};
   ssl_certificate_key {{ service_config["ssl_key"] }};
