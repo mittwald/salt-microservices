@@ -150,7 +150,7 @@ def run():
                         "service_name": service_name,
                         "service_config": service_config
                     }},
-                    {"require": [{"file": "/var/log/services/%s" % service_name}]}
+                    {"require": [{"file": "/var/log/services/%s" % service_name}]},
                     {"watch_in": [{"service": "nginx"}]}
                 ]
             }
