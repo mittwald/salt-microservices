@@ -43,13 +43,17 @@ def run():
                     {"image": container_config['docker_image']},
                     {"stateful": container_config["stateful"]},
                     {"dns": [dns_ip]},
-                    {"domain": "consul"},
-                    {"watch_in": [{"file": "/etc/haproxy/haproxy.cfg"}]}
+                    {"domain": "consul"}
                 ]
 
                 if 'http' in container_config and container_config['http']:
                     base_port = container_config['base_port']
                     host_port = base_port + container_number
+
+                    container_state.append({"watch_in": [
+                        {"file": "/etc/nginx/sites-available/service_%s.conf" % service_name},
+                        {"file": "/etc/nginx/sites-enabled/service_%s.conf" % service_name}
+                    ]})
 
                     container_port = 80
                     if 'http_internal_port' in container_config:
