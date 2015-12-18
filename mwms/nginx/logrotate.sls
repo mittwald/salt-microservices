@@ -16,6 +16,6 @@
           notifempty
           create 0640 www-data adm
           postrotate
-		        invoke-rc.d nginx rotate >/dev/null 2>&1
+            invoke-rc.d nginx rotate >/dev/null 2>&1
           endscript
         }
