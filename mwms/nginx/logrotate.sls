@@ -7,7 +7,7 @@
 /etc/logrotate.d/services:
   file.managed:
     - contents: |
-        var/log/services/*/access.log {
+        /var/log/services/*/access.log {
           daily
           missingok
           rotate 30
