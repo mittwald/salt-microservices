@@ -14,7 +14,7 @@ server {
 
   access_log /var/log/services/{{ service_name }}/access.log combined;
 
-{% if service_config['ssl_force'] | default(true) %}
+{% if "ssl_certificate" in service_config and service_config['ssl_force'] | default(true) %}
   return 301 https://$host$request_uri;
 {% else %}
   location / {
