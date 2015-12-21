@@ -199,6 +199,9 @@ Salt pillars.
 microservices:
   example:
     hostname: example.services.acme.co
+    ssl_certificate: /etc/ssl/certs/your-domain.pem
+    ssl_key: /etc/ssl/private/your-domain.key
+    ssl_force: True
     containers:
       web:
         instances: 2
