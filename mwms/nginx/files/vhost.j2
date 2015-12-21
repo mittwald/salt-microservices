@@ -41,6 +41,10 @@ server {
 
   ssl on;
 
+{% if service_config['ssl_force'] | default(true) %}
+  add_header Strict-Transport-Security max-age=31536000;
+{% endif %}
+
   location / {
     proxy_set_header Host $host;
     proxy_set_header X-Real-IP $remote_addr;
