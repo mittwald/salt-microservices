@@ -199,6 +199,9 @@ Salt pillars.
 microservices:
   example:
     hostname: example.services.acme.co
+    ssl_certificate: /etc/ssl/certs/your-domain.pem
+    ssl_key: /etc/ssl/private/your-domain.key
+    ssl_force: True
     containers:
       web:
         instances: 2
@@ -279,6 +282,10 @@ A service definition is a YAML object consisting of the following properties:
 *   `ssl_certificate` and `ssl_key` (*optional*): The path to a SSL certificate
     and the associated private key to use to encrypt the connections to the
     respective service.
+
+*   `ssl_force` (*optional*): When a `ssl_certificate` is defined, by default
+    all unencrypted HTTP traffic will be redirected to SSL. Set this value to
+    `False` to still allow unencrypted HTTP traffic.
 
 ### Container definition
 
