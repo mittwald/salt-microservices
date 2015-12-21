@@ -283,6 +283,10 @@ A service definition is a YAML object consisting of the following properties:
     and the associated private key to use to encrypt the connections to the
     respective service.
 
+*   `ssl_force` (*optional*): When a `ssl_certificate` is defined, by default
+    all unencrypted HTTP traffic will be redirected to SSL. Set this value to
+    `False` to still allow unencrypted HTTP traffic.
+
 ### Container definition
 
 A container definition is a YAML object consisting of the properties defined
