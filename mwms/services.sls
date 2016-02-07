@@ -118,10 +118,15 @@ def run():
             if has_http:
                 consul_service["port"] = 80
 
+                if 'check_url' in service_config:
+                    check_url = service_config['check_url']
+                else:
+                    check_url = "http://%s" % (service_config["hostname"])
+
                 # noinspection PyUnresolvedReferences
                 checks.append({
                     "name": "HTTP connectivity",
-                    "http": "http://%s" % (service_config["hostname"]),
+                    "http": check_url,
                     "interval": "1m"
                 })
             else:
