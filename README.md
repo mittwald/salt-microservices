@@ -19,7 +19,7 @@ deploying a small, Docker-based [microservice](http://martinfowler.com/articles/
 architecture, implementing the following features:
 
 - Container-based deployment
-- Using [Consul](http://consul.io) for service discovery
+- Using [Consul][consul] for service discovery
 - Using [NGINX][nginx] for load balancing and service routing
 - Zero-downtime (re)deployment of services using a few custom Salt modules
 
@@ -287,6 +287,10 @@ A service definition is a YAML object consisting of the following properties:
     all unencrypted HTTP traffic will be redirected to SSL. Set this value to
     `False` to still allow unencrypted HTTP traffic.
 
+*   `checks` (*optional*): Can contain additional health checks for
+    [Consul][consul]. See the [Consul documentation on health checks][consul-checks]
+    for more information.
+
 ### Container definition
 
 A container definition is a YAML object consisting of the properties defined
@@ -419,6 +423,8 @@ This is done sequentially and with a grace time of 60 seconds. If your service
 consists of more than one instance of the same container, the deployment will
 not cause ~~any~~ significant downtime.
 
+[consul]: http://consul.io
+[consul-checks]: https://www.consul.io/docs/agent/checks.html
 [kubernetes]: http://kubernetes.io/
 [marathon]: https://mesosphere.github.io/marathon/
 [nginx]: http://nginx.org
