@@ -121,7 +121,14 @@ def run():
                 if 'check_url' in service_config:
                     check_url = service_config['check_url']
                 else:
-                    check_url = "http://%s" % (service_config["hostname"])
+                    prot = 'http'
+
+                    if 'ssl_certificate' in service_config:
+                        prot = 'https'
+                    if 'ssl_force' in service_config and not service_config['ssl_force']:
+                        prot = 'http'
+
+                    check_url = "%s://%s" % (prot, service_config["hostname"])
 
                 # noinspection PyUnresolvedReferences
                 checks.append({
