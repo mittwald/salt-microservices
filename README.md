@@ -291,6 +291,10 @@ A service definition is a YAML object consisting of the following properties:
     [Consul][consul]. See the [Consul documentation on health checks][consul-checks]
     for more information.
 
+*   `check_url` (*optional*): The URL to use for the Consul health check. This
+    option will only be used when the service is accessibly via HTTP. If not
+    specified, the service's `hostname` property will be used as URL.
+
 ### Container definition
 
 A container definition is a YAML object consisting of the properties defined
