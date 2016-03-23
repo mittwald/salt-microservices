@@ -31,7 +31,7 @@ def run():
                 ]
             }
 
-            backup_command = "docker run --rm --link %s:source -v %s/$(date +%%Y%%m%%d):/target --volumes-from %s %s %s" % (first_container_name, backup_dir, first_container_name, image, command)
+            backup_command = "docker run --rm --link %s:source -v %s/$(date +\\%%Y\\%%m\\%%d):/target --volumes-from %s %s %s" % (first_container_name, backup_dir, first_container_name, image, command)
 
             config[backup_command] = {
                 "cron.present": [
