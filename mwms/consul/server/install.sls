@@ -45,7 +45,7 @@ def run():
         },
         consul_ui_dir: {
             "archive.extracted": [
-                {"source": "salt://consul/files/0.5.2_web_ui.zip"},
+                {"source": "salt://mwms/consul/files/0.5.2_web_ui.zip"},
                 {"archive_format": "zip"},
                 {"unless": "test -d %s" % consul_ui_dir }
             ]
