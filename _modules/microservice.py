@@ -82,6 +82,13 @@ def redeploy(service_name, tag_override='latest'):
                     linked_container_name = "%s-%s-0" % (service_name, linked_container)
                     links[linked_container_name] = alias
 
+            volumes_from = None
+            if 'volumes_from' in container_config:
+                volumes_from = []
+                for volume_container in container_config['volumes_from']:
+                    volume_container_name = "%s-%s-0" % (service_name, volume_container)
+                    volumes_from.append(volume_container_name)
+
             volumes = []
             if "volumes" in container_config:
                 volumes = []
@@ -108,7 +115,7 @@ def redeploy(service_name, tag_override='latest'):
                 environment=container_config["environment"] if "environment" in container_config else None,
                 links=links,
                 volumes=volumes,
-                volumes_from=container_config["volumes_from"] if "volumes_from" in container_config else None,
+                volumes_from=volumes_from,
                 udp_ports=[],
                 tcp_ports=ports,
                 restart=container_config["restart"] if "restart" in container_config else True,
