@@ -73,6 +73,16 @@ def run():
                 if len(links) > 0:
                     container_state.append({"links": links})
 
+                volumes_from = []
+                if 'volumes_from' in container_config:
+                    for volume_container, alias in container_config['volumes_from']:
+                        volume_container_name = "%s-%s-0" % (service_name, volume_container)
+                        volumes_from.append(volume_container_name)
+                        requirements.append({"mwdocker": volume_container_name})
+
+                if len(volumes_from) > 0:
+                    container_state.append({"volumes_from": volumes_from})
+
                 passthrough_args = ("environment", "restart", "user", "command")
                 for p in passthrough_args:
                     if p in container_config:
