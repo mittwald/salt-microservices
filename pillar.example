@@ -9,6 +9,7 @@ consul:
     udp:
       dns: 53
   server_pattern: 'consul-server*'
+  server_target_mode: 'glob'
   services:
     example:
       name: "example",
