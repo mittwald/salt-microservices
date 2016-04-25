@@ -153,13 +153,14 @@ You need at least one Consul server in your cluster (althoug a number of three
 or five should be used in production for a high-availability setup).
 
 First of all, you need to configure a [targeting expression][salt-targeting]
-that can be used to match your consul servers. The default expression will
-simply match the minion ID against the pattern `consul-server*`. Use the pillar
-`consul:server_pattern` for this:
+(and optionally a targeting mode) that can be used to match your consul servers.
+The default expression will simply match the minion ID against the pattern
+`consul-server*`. Use the pillar `consul:server_pattern` for this:
 
 ```yaml
 consul:
   server_pattern: "<your-consul-server-pattern>"
+  server_target_mode: "<glob|pcre|...>"
 ```
 
 You can install these servers by using the `mwms.consul.server` state in your
