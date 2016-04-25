@@ -361,6 +361,17 @@ You can use the following configuration options for each container:
       - ["files", "/opt/service-resources", "ro"]
     ```
 
+*   `volumes_from`: A list of *containers* from which volumes should be used.
+    Use the service-local container name, here. Containers should be specified
+    as a simple list.
+
+    Example:
+
+    ```yaml
+    volumes_from:
+      - database
+    ```
+
 *   `environment`: A map of environment variables to set for this container.
     **Note:** When using this feature for setting confidential data like API
     tokens or passwords, consider using [Salt's GPG encryption features][salt-gpg].
