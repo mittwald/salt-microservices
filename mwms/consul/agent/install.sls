@@ -11,8 +11,11 @@ import json
 
 def run():
     consul_server_pattern = salt['pillar.get']('consul:server_pattern', 'consul-server*')
+    consul_server_targetmode = salt['pillar.get']('consul:server_target_mode', 'glob')
     consul_data_dir = salt['pillar.get']('consul:data_dir', '/var/lib/consul/data')
     consul_config_dir = salt['pillar.get']('consul:config_dir', '/etc/consul')
+
+    peers = salt['mine.get'](consul_server_pattern, 'network.ip_addrs', expr_form=consul_server_targetmode).items()
 
     consul_client_config = {
         "data_dir": consul_data_dir,
@@ -21,7 +24,7 @@ def run():
         "datacenter": salt['pillar.get']('consul:datacenter', 'dc1'),
         "client_addr": "127.0.0.1",
         "advertise_addr": salt['grains.get']('ip4_interfaces:eth0')[0],
-        "start_join": [b[0] for a,b in __salt__['mine.get'](consul_server_pattern, 'network.ip_addrs').items()],
+        "start_join": [addresses[0] for name, addresses in peers],
         "recursors": salt['pillar.get']('consul:nameservers', ["8.8.8.8"]),
         "dns_config": {
             "allow_stale": True,

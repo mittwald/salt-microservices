@@ -11,11 +11,12 @@ import json
 
 def run():
     consul_server_pattern = salt['pillar.get']('consul:server_pattern', 'consul-server*')
+    consul_server_targetmode = salt['pillar.get']('consul:server_target_mode', 'glob')
     consul_data_dir = salt['pillar.get']('consul:data_dir', '/var/lib/consul/data')
     consul_ui_dir = salt['pillar.get']('consul:ui_dir', '/var/lib/consul/ui')
     consul_config_dir = salt['pillar.get']('consul:config_dir', '/etc/consul')
 
-    peers = salt['mine.get'](consul_server_pattern, 'network.ip_addrs').items()
+    peers = salt['mine.get'](consul_server_pattern, 'network.ip_addrs', expr_form=consul_server_targetmode).items()
 
     consul_client_config = {
         "data_dir": consul_data_dir,
