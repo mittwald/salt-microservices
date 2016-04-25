@@ -43,6 +43,9 @@ def run():
                 {"makedirs": True}
             ]
         },
+        "/etc/consul/agent.json": {
+            "file.absent": []
+        },
         consul_ui_dir: {
             "archive.extracted": [
                 {"source": "salt://mwms/consul/files/0.5.2_web_ui.zip"},

@@ -43,6 +43,9 @@ def run():
                 {"makedirs": True}
             ]
         },
+        "/etc/consul/server.json": {
+            "file.absent": []
+        },
         "/etc/supervisor/conf.d/consul.conf": {
             "file.managed": [
                 {"source": "salt://mwms/consul/files/supervisor-agent.conf"},
