@@ -75,7 +75,7 @@ def run():
 
                 volumes_from = []
                 if 'volumes_from' in container_config:
-                    for volume_container, alias in container_config['volumes_from']:
+                    for volume_container in container_config['volumes_from']:
                         volume_container_name = "%s-%s-0" % (service_name, volume_container)
                         volumes_from.append(volume_container_name)
                         requirements.append({"mwdocker": volume_container_name})
