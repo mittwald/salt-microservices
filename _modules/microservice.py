@@ -66,7 +66,8 @@ def redeploy(service_name, tag_override='latest'):
 
             if used_image_id == current_image_id:
                 result["container_ids"][container_name]["new"] = result["container_ids"][container_name]["old"]
-                continue
+                if 'volumes_from' not in container_config:
+                    continue
 
             if existing_container_info is not None:
                 if 'stateful' in container_config and container_config['stateful']:
