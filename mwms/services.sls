@@ -43,7 +43,11 @@ def run():
                     {"image": container_config['docker_image']},
                     {"stateful": container_config["stateful"]},
                     {"dns": [dns_ip]},
-                    {"domain": "consul"}
+                    {"domain": "consul"},
+                    {"labels": {
+                        "service": service_name,
+                        "service_group": "%s-%s" % (service_name, container_name)
+                    }}
                 ]
 
                 if 'http' in container_config and container_config['http']:
