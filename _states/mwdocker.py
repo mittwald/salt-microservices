@@ -103,6 +103,9 @@ def running(name, image, volumes=(), restart=True, tcp_ports=(), udp_ports=(), e
         ret['changes']['running'] = {'old': False, 'new': True}
 
         __salt__['mwdocker.start_container'](name, warmup_wait=warmup_wait)
+    else:
+        ret['changes']['container'] = {'new': '<NEW-CONTAINER-ID>'}
+        ret['changes']['running'] = {'old': False, 'new': True}
 
     return ret
 
@@ -171,8 +174,11 @@ def __does_existing_container_matches_spec(client, ret, existing, name, image, v
                 up_to_spec = False
 
     if command is not None:
-        if " ".join(existing['Config']['Cmd']) != command:
-            ret['changes']['command'] = {'old': " ".join(existing['Config']['Cmd']), 'new': command}
+        joined_command = command
+        if type(command) is list:
+            joined_command = " ".join(command)
+        if " ".join(existing['Config']['Cmd']) != joined_command:
+            ret['changes']['command'] = {'old': " ".join(existing['Config']['Cmd']), 'new': joined_command}
             up_to_spec = False
 
     if dns is not None and existing['HostConfig']['Dns'] != dns:

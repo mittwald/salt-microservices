@@ -1,0 +1,4 @@
+include:
+  - .alertmanager
+  - .prometheus
+  - .grafana

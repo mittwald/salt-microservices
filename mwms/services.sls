@@ -59,7 +59,33 @@ def run():
                     if 'http_internal_port' in container_config:
                         container_port = container_config['http_internal_port']
 
-                    container_state.append({"tcp_ports": [{"address": "127.0.0.1", "port": container_port, "host_port": host_port}]})
+                    container_state.append({"tcp_ports": [{"address": "0.0.0.0", "port": container_port, "host_port": host_port}]})
+
+                    consul_service = {
+                        "name": service_name,
+                        "id": "%s-%d" % (service_name, container_number),
+                        "port": host_port
+                    }
+
+                    check_url = "http://localhost:%d%s" % (host_port, service_config['check_url'] if 'check_url' in service_config else '/status')
+
+                    checks = service_config["checks"] if "checks" in service_config else []
+                    checks.append({
+                        "name": "HTTP connectivity",
+                        "http": check_url,
+                        "interval": "1m"
+                    })
+
+                    if len(checks) > 0:
+                        consul_service["checks"] = checks
+
+                    config["/etc/consul/service-%s-%d.json" % (service_name, container_number)] = {
+                        "file.managed": [
+                            {"contents": json.dumps({"service": consul_service}, indent=4)},
+                            {"watch_in": [{"cmd": "consul-reload"}]}
+                        ]
+                    }
+
                 elif 'ports' in container_config:
                     container_state.append({"tcp_ports": container_config['ports']})
 
@@ -121,43 +147,43 @@ def run():
             if "ports" in c and has_port is None:
                 has_port = c["ports"][0]
 
-        if has_http or has_port is not None:
-            consul_service = {"name": service_name}
-            checks = service_config["checks"] if "checks" in service_config else []
-
-            if has_http:
-                consul_service["port"] = 80
-
-                if 'check_url' in service_config:
-                    check_url = service_config['check_url']
-                else:
-                    prot = 'http'
-
-                    if 'ssl_certificate' in service_config:
-                        prot = 'https'
-                    if 'ssl_force' in service_config and not service_config['ssl_force']:
-                        prot = 'http'
-
-                    check_url = "%s://%s" % (prot, service_config["hostname"])
-
-                # noinspection PyUnresolvedReferences
-                checks.append({
-                    "name": "HTTP connectivity",
-                    "http": check_url,
-                    "interval": "1m"
-                })
-            else:
-                consul_service["port"] = has_port
-
-            if len(checks) > 0:
-                consul_service["checks"] = checks
-
-            config["/etc/consul/service-%s.json" % service_name] = {
-                "file.managed": [
-                    {"contents": json.dumps({"service": consul_service}, indent=4)},
-                    {"watch_in": [{"cmd": "consul-reload"}]}
-                ]
-            }
+        #if has_http or has_port is not None:
+        #    consul_service = {"name": service_name}
+        #    checks = service_config["checks"] if "checks" in service_config else []
+        #
+        #    if has_http:
+        #        consul_service["port"] = 80
+        #
+        #        if 'check_url' in service_config:
+        #            check_url = service_config['check_url']
+        #        else:
+        #            prot = 'http'
+        #
+        #            if 'ssl_certificate' in service_config:
+        #                prot = 'https'
+        #            if 'ssl_force' in service_config and not service_config['ssl_force']:
+        #                prot = 'http'
+        #
+        #            check_url = "%s://%s" % (prot, service_config["hostname"])
+        #
+        #        # noinspection PyUnresolvedReferences
+        #        checks.append({
+        #            "name": "HTTP connectivity",
+        #            "http": check_url,
+        #            "interval": "1m"
+        #        })
+        #    else:
+        #        consul_service["port"] = has_port
+        #
+        #    if len(checks) > 0:
+        #        consul_service["checks"] = checks
+        #
+        #    config["/etc/consul/service-%s.json" % service_name] = {
+        #        "file.managed": [
+        #            {"contents": json.dumps({"service": consul_service}, indent=4)},
+        #            {"watch_in": [{"cmd": "consul-reload"}]}
+        #        ]
+        #    }
 
         if has_http:
             config["/var/log/services/%s" % service_name] = {

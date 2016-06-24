@@ -402,6 +402,18 @@ include the following:
 3. Configure maintenance cron jobs for each service as defined in the pillar.
    These will be run in temporary docker containers.
 
+### `mwms.monitoring`
+
+Installs a cAdvisor container that gathers host and container metrics. This is
+probably most useful when you're also using the `mwms.prometheus` state on one
+or more of your nodes.
+
+### `mwms.prometheus`
+
+Sets up a Prometheus server for gathering metrics and alerting. The setup
+consists of the actual Prometheus service, the Alertmanager and a Grafana
+frontend.
+
 ## State reference
 
 ### `consul.node`
