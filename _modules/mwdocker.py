@@ -110,7 +110,7 @@ def delete_container(name):
 
 
 def create_container(name, image, command=None, environment=None, volumes=(), udp_ports=None, tcp_ports=None,
-                     restart=True, dns=None, domain=None, volumes_from=None, links=None, user=None, test=False):
+                     restart=True, dns=None, domain=None, volumes_from=None, links=None, user=None, labels=None, test=False):
     """
     Creates a new container.
 
@@ -132,6 +132,7 @@ def create_container(name, image, command=None, environment=None, volumes=(), ud
     :param links: A dictionary of containers to link (using the container name
         as index and the alias as value)
     :param user: The user under which to start the container
+    :param dict labels: A dictionary of labels to attach to this container
     :param test: Set to `True` to not actually do anything
     """
 
@@ -172,7 +173,8 @@ def create_container(name, image, command=None, environment=None, volumes=(), ud
         host_config=host_config,
         volumes=binds,
         environment=environment,
-        user=user
+        user=user,
+        labels=labels
     )
     return container['Id']
 

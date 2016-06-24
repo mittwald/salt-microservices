@@ -21,7 +21,7 @@ if not '__salt__' in globals():
 
 
 def running(name, image, volumes=(), restart=True, tcp_ports=(), udp_ports=(), environment=None, command=None, dns=None,
-            domain=None, volumes_from=None, links=None, user=None, warmup_wait=60, stateful=False):
+            domain=None, volumes_from=None, links=None, user=None, warmup_wait=60, stateful=False, labels=None):
     """
     Asserts that a container matching the provided specification is up and
     running.
@@ -65,7 +65,8 @@ def running(name, image, volumes=(), restart=True, tcp_ports=(), udp_ports=(), e
         matches_spec = __does_existing_container_matches_spec(client, ret, existing, name, image, tcp_ports=tcp_ports,
                                                               volumes=volumes, udp_ports=udp_ports,
                                                               environment=environment, command=command, dns=dns,
-                                                              volumes_from=volumes_from, links=links, domain=domain)
+                                                              volumes_from=volumes_from, links=links, domain=domain,
+                                                              labels=labels)
 
         if not matches_spec and stateful:
             ret["result"] = False
@@ -96,6 +97,7 @@ def running(name, image, volumes=(), restart=True, tcp_ports=(), udp_ports=(), e
             dns=dns,
             domain=domain,
             user=user,
+            labels=labels,
             test=__opts__['test']
         )
 
@@ -112,9 +114,12 @@ def running(name, image, volumes=(), restart=True, tcp_ports=(), udp_ports=(), e
 
 def __does_existing_container_matches_spec(client, ret, existing, name, image, volumes=(), restart=True, tcp_ports=(),
                                            udp_ports=(), environment=None, command=None, dns=None, volumes_from=None,
-                                           links=None, domain=None):
+                                           links=None, domain=None, labels=None):
     up_to_spec = True
     image_id = __salt__['mwdocker.image_id'](image)
+
+    if labels is None:
+        labels = {}
 
     if existing['Image'] != image_id:
         ret['changes']['image'] = {'old': existing['Image'], 'new': image_id}
@@ -199,5 +204,9 @@ def __does_existing_container_matches_spec(client, ret, existing, name, image, v
         if existing['HostConfig']['DnsSearch'] != [domain]:
             ret['changes']['domain'] = {'old': existing['HostConfig']['DnsSearch'], 'new': [domain]}
             up_to_spec = False
+
+    if existing['Config']['Labels'] != labels:
+        res['changes']['labels'] = {'old': existing['Config']['Labels'], 'new': labels}
+        up_to_spec = False
 
     return up_to_spec
