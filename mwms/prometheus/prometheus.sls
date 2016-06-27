@@ -1,5 +1,6 @@
 {% set prom_config = salt['pillar.get']('prometheus:configuration', {}) %}
-{% set prom_data_dir =salt['pillar.get']('prometheus:data_dir', '/var/lib/prometheus') %}
+{% set prom_data_dir = salt['pillar.get']('prometheus:data_dir', '/var/lib/prometheus') %}
+{% set prom_internal_port = salt['pillar.get']('prometheus:internal_port', 9090) %}
 
 /etc/prometheus/prometheus.yml:
   file.managed:
@@ -22,7 +23,7 @@ prometheus:
       - "-config.file=/prometheus-config/prometheus.yml"
       - "-alertmanager.url=http://alertmanager:9093/"
     - tcp_ports:
-      - port: 9090
+      - port: {{ prom_internal_port }}
         address: 0.0.0.0
     - warmup_wait: 10
     - labels:
