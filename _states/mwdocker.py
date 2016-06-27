@@ -21,26 +21,27 @@ if not '__salt__' in globals():
 
 
 def running(name, image, volumes=(), restart=True, tcp_ports=(), udp_ports=(), environment=None, command=None, dns=None,
-            domain=None, volumes_from=None, links=None, user=None, warmup_wait=60, stateful=False):
+            domain=None, volumes_from=None, links=None, user=None, warmup_wait=60, stateful=False, labels=None):
     """
     Asserts that a container matching the provided specification is up and
     running.
 
-    :param name: The container name
-    :param image: The image from which to create the container
-    :param volumes: A list of volumes. Each volume definition is a string of the format "<host-directory>:<container-directory>:<rw|ro>"
-    :param restart: `True` to restart the container when it stops
-    :param tcp_ports: TCP ports to expose. This is a list of dictionaries that must provide a "port" and an "address" key
-    :param udp_ports: UDP ports to expose. This is a list of dictionaries that must provide a "port" and an "address" key
-    :param environment: A dictionary of environment variables to pass into the container
-    :param command: The command to use for the container
-    :param dns: A list of DNS server addresses to use
-    :param domain: The DNS search domain
-    :param volumes_from: A list of container names from which to use the volumes
-    :param links: A dictionary of containers to link (using the container name as index and the alias as value)
-    :param user: The user under which to start the container
-    :param warmup_wait: The amount of time to wait for the container to start
-    :param stateful: Set to `True` to prevent this container from automatic deletion
+    :param str      name: The container name
+    :param str      image: The image from which to create the container
+    :param list     volumes: A list of volumes. Each volume definition is a string of the format "<host-directory>:<container-directory>:<rw|ro>"
+    :param bool     restart: `True` to restart the container when it stops
+    :param list     tcp_ports: TCP ports to expose. This is a list of dictionaries that must provide a "port" and an "address" key
+    :param list     udp_ports: UDP ports to expose. This is a list of dictionaries that must provide a "port" and an "address" key
+    :param dict     environment: A dictionary of environment variables to pass into the container
+    :param str|list command: The command to use for the container
+    :param str      dns: A list of DNS server addresses to use
+    :param str      domain: The DNS search domain
+    :param list     volumes_from: A list of container names from which to use the volumes
+    :param dict     links: A dictionary of containers to link (using the container name as index and the alias as value)
+    :param str      user: The user under which to start the container
+    :param int      warmup_wait: The amount of time to wait for the container to start
+    :param bool     stateful: Set to `True` to prevent this container from automatic deletion
+    :param dict     labels: A dictionary of labels that should be attached to the container
     """
     ret = {
         'name': name,
@@ -65,17 +66,20 @@ def running(name, image, volumes=(), restart=True, tcp_ports=(), udp_ports=(), e
         matches_spec = __does_existing_container_matches_spec(client, ret, existing, name, image, tcp_ports=tcp_ports,
                                                               volumes=volumes, udp_ports=udp_ports,
                                                               environment=environment, command=command, dns=dns,
-                                                              volumes_from=volumes_from, links=links, domain=domain)
+                                                              volumes_from=volumes_from, links=links, domain=domain,
+                                                              labels=labels)
 
         if not matches_spec and stateful:
-            ret["result"] = False
-            ret["comment"] = 'Existing container does not match specification, and I\'m to scared to delete it.'
+            ret['comment'] += "Deleting old version of container %s with gracious timeout, keeping volumes\n" % name
+            if not __opts__['test']:
+                # noinspection PyCallingNonCallable
+                __salt__['mwdocker.delete_container'](name, timeout=60, with_volumes=False)
             return ret
         elif not matches_spec:
             ret['comment'] += "Deleting old version of container %s\n" % name
             if not __opts__['test']:
                 # noinspection PyCallingNonCallable
-                __salt__['mwdocker.delete_container'](name)
+                __salt__['mwdocker.delete_container'](name, with_volumes=True)
         else:
             ret['comment'] += 'Container exists and is up to spec.\n'
             return ret
@@ -96,6 +100,7 @@ def running(name, image, volumes=(), restart=True, tcp_ports=(), udp_ports=(), e
             dns=dns,
             domain=domain,
             user=user,
+            labels=labels,
             test=__opts__['test']
         )
 
@@ -103,15 +108,21 @@ def running(name, image, volumes=(), restart=True, tcp_ports=(), udp_ports=(), e
         ret['changes']['running'] = {'old': False, 'new': True}
 
         __salt__['mwdocker.start_container'](name, warmup_wait=warmup_wait)
+    else:
+        ret['changes']['container'] = {'new': '<NEW-CONTAINER-ID>'}
+        ret['changes']['running'] = {'old': False, 'new': True}
 
     return ret
 
 
 def __does_existing_container_matches_spec(client, ret, existing, name, image, volumes=(), restart=True, tcp_ports=(),
                                            udp_ports=(), environment=None, command=None, dns=None, volumes_from=None,
-                                           links=None, domain=None):
+                                           links=None, domain=None, labels=None):
     up_to_spec = True
     image_id = __salt__['mwdocker.image_id'](image)
+
+    if labels is None:
+        labels = {}
 
     if existing['Image'] != image_id:
         ret['changes']['image'] = {'old': existing['Image'], 'new': image_id}
@@ -171,8 +182,11 @@ def __does_existing_container_matches_spec(client, ret, existing, name, image, v
                 up_to_spec = False
 
     if command is not None:
-        if " ".join(existing['Config']['Cmd']) != command:
-            ret['changes']['command'] = {'old': " ".join(existing['Config']['Cmd']), 'new': command}
+        joined_command = command
+        if type(command) is list:
+            joined_command = " ".join(command)
+        if " ".join(existing['Config']['Cmd']) != joined_command:
+            ret['changes']['command'] = {'old': " ".join(existing['Config']['Cmd']), 'new': joined_command}
             up_to_spec = False
 
     if dns is not None and existing['HostConfig']['Dns'] != dns:
@@ -193,5 +207,9 @@ def __does_existing_container_matches_spec(client, ret, existing, name, image, v
         if existing['HostConfig']['DnsSearch'] != [domain]:
             ret['changes']['domain'] = {'old': existing['HostConfig']['DnsSearch'], 'new': [domain]}
             up_to_spec = False
+
+    if existing['Config']['Labels'] != labels:
+        ret['changes']['labels'] = {'old': existing['Config']['Labels'], 'new': labels}
+        up_to_spec = False
 
     return up_to_spec

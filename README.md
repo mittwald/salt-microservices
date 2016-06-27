@@ -21,6 +21,7 @@ architecture, implementing the following features:
 - Container-based deployment
 - Using [Consul][consul] for service discovery
 - Using [NGINX][nginx] for load balancing and service routing
+- Using [Prometheus][prom] and [Grafana][grafana] for monitoring and alerting
 - Zero-downtime (re)deployment of services using a few custom Salt modules
 
 ```
@@ -186,6 +187,23 @@ You can use the `mwms.consul.agent` state for this. Furthermore, use the
 'service-node*':
   - mwms.consul.agent
   - mwms.services
+```
+
+### Setting up monitoring
+
+For monitoring services, you can use the `mwms.monitoring` state for every node:
+
+```yaml
+'service-node*':
+  - mwms.monitoring
+```
+
+To install a Prometheus server to actually gather metrics, use the
+`mwms.prometheus` state on one of your nodes:
+
+```yaml
+'service-node-monitoring':
+  - mwms.prometheus
 ```
 
 # Deploying services
@@ -402,6 +420,21 @@ include the following:
 3. Configure maintenance cron jobs for each service as defined in the pillar.
    These will be run in temporary docker containers.
 
+### `mwms.monitoring`
+
+Installs cAdvisor on your host that gathers host and container metrics. This is
+probably most useful when you're also using the `mwms.prometheus` state on one
+or more of your nodes.
+
+Note that due to Docker issue [#17902](https://github.com/docker/docker/issues/17902),
+cAdvisor is started directly on the host, not within a Docker container.
+
+### `mwms.prometheus`
+
+Sets up a Prometheus server for gathering metrics and alerting. The setup
+consists of the actual Prometheus service, the Alertmanager and a Grafana
+frontend.
+
 ## State reference
 
 ### `consul.node`
@@ -439,11 +472,14 @@ This is done sequentially and with a grace time of 60 seconds. If your service
 consists of more than one instance of the same container, the deployment will
 not cause ~~any~~ significant downtime.
 
+[cadvisor]: https://github.com/google/cadvisor
 [consul]: http://consul.io
 [consul-checks]: https://www.consul.io/docs/agent/checks.html
+[grafana]: http://grafana.org
 [kubernetes]: http://kubernetes.io/
 [marathon]: https://mesosphere.github.io/marathon/
 [nginx]: http://nginx.org
+[prom]: http://prometheus.io
 [py-requests]: http://www.python-requests.org/en/latest/
 [salt-formulas]: https://docs.saltstack.com/en/latest/topics/development/conventions/formulas.html
 [salt-gpg]: https://docs.saltstack.com/en/stage/ref/renderers/all/salt.renderers.gpg.html
