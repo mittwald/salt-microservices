@@ -26,21 +26,22 @@ def running(name, image, volumes=(), restart=True, tcp_ports=(), udp_ports=(), e
     Asserts that a container matching the provided specification is up and
     running.
 
-    :param name: The container name
-    :param image: The image from which to create the container
-    :param volumes: A list of volumes. Each volume definition is a string of the format "<host-directory>:<container-directory>:<rw|ro>"
-    :param restart: `True` to restart the container when it stops
-    :param tcp_ports: TCP ports to expose. This is a list of dictionaries that must provide a "port" and an "address" key
-    :param udp_ports: UDP ports to expose. This is a list of dictionaries that must provide a "port" and an "address" key
-    :param environment: A dictionary of environment variables to pass into the container
-    :param command: The command to use for the container
-    :param dns: A list of DNS server addresses to use
-    :param domain: The DNS search domain
-    :param volumes_from: A list of container names from which to use the volumes
-    :param links: A dictionary of containers to link (using the container name as index and the alias as value)
-    :param user: The user under which to start the container
-    :param warmup_wait: The amount of time to wait for the container to start
-    :param stateful: Set to `True` to prevent this container from automatic deletion
+    :param str      name: The container name
+    :param str      image: The image from which to create the container
+    :param list     volumes: A list of volumes. Each volume definition is a string of the format "<host-directory>:<container-directory>:<rw|ro>"
+    :param bool     restart: `True` to restart the container when it stops
+    :param list     tcp_ports: TCP ports to expose. This is a list of dictionaries that must provide a "port" and an "address" key
+    :param list     udp_ports: UDP ports to expose. This is a list of dictionaries that must provide a "port" and an "address" key
+    :param dict     environment: A dictionary of environment variables to pass into the container
+    :param str|list command: The command to use for the container
+    :param str      dns: A list of DNS server addresses to use
+    :param str      domain: The DNS search domain
+    :param list     volumes_from: A list of container names from which to use the volumes
+    :param dict     links: A dictionary of containers to link (using the container name as index and the alias as value)
+    :param str      user: The user under which to start the container
+    :param int      warmup_wait: The amount of time to wait for the container to start
+    :param bool     stateful: Set to `True` to prevent this container from automatic deletion
+    :param dict     labels: A dictionary of labels that should be attached to the container
     """
     ret = {
         'name': name,
