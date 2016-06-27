@@ -95,6 +95,7 @@ def delete_container(name, timeout=10, with_volumes=False):
     Stops and deletes a container.
 
     :param str name: Name of the container to delete
+    :param int timeout: Time in seconds to wait for the container to start
     :param bool with_volumes: TRUE to also delete volumes
     """
     log.info("Deleting container %s" % name)
