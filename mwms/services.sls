@@ -158,44 +158,6 @@ def run():
             ]
         }
 
-        #if has_http or has_port is not None:
-        #    consul_service = {"name": service_name}
-        #    checks = service_config["checks"] if "checks" in service_config else []
-        #
-        #    if has_http:
-        #        consul_service["port"] = 80
-        #
-        #        if 'check_url' in service_config:
-        #            check_url = service_config['check_url']
-        #        else:
-        #            prot = 'http'
-        #
-        #            if 'ssl_certificate' in service_config:
-        #                prot = 'https'
-        #            if 'ssl_force' in service_config and not service_config['ssl_force']:
-        #                prot = 'http'
-        #
-        #            check_url = "%s://%s" % (prot, service_config["hostname"])
-        #
-        #        # noinspection PyUnresolvedReferences
-        #        checks.append({
-        #            "name": "HTTP connectivity",
-        #            "http": check_url,
-        #            "interval": "1m"
-        #        })
-        #    else:
-        #        consul_service["port"] = has_port
-        #
-        #    if len(checks) > 0:
-        #        consul_service["checks"] = checks
-        #
-        #    config["/etc/consul/service-%s.json" % service_name] = {
-        #        "file.managed": [
-        #            {"contents": json.dumps({"service": consul_service}, indent=4)},
-        #            {"watch_in": [{"cmd": "consul-reload"}]}
-        #        ]
-        #    }
-
         if has_http:
             config["/var/log/services/%s" % service_name] = {
                 "file.directory": [
