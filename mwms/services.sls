@@ -151,6 +151,13 @@ def run():
             if "ports" in c and has_port is None:
                 has_port = c["ports"][0]
 
+
+        config["/etc/consul/service-%s.json" % service_name] = {
+            "file.absent": [
+                {"watch_in": [{"cmd": "consul-reload"}]}
+            ]
+        }
+
         #if has_http or has_port is not None:
         #    consul_service = {"name": service_name}
         #    checks = service_config["checks"] if "checks" in service_config else []
