@@ -24,6 +24,9 @@ grafana:
     - links:
         prometheus: prometheus
     - warmup_wait: 10
+    - labels:
+        service: prometheus
+        service_group: prometheus-grafana
     - require:
       - file: grafana-data-dir
       - file: grafana-plugin-dir

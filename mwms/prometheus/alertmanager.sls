@@ -18,5 +18,8 @@ alertmanager:
       - port: 9093
         address: 0.0.0.0
     - warmup_wait: 10
+    - labels:
+        service: prometheus
+        service_group: prometheus-alertmanager
     - require:
       - service: docker

@@ -25,6 +25,9 @@ prometheus:
       - port: 9090
         address: 0.0.0.0
     - warmup_wait: 10
+    - labels:
+        service: prometheus
+        service_group: prometheus-main
     - require:
       - service: docker
       - mwdocker: alertmanager
