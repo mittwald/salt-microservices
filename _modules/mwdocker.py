@@ -90,11 +90,12 @@ def image_id(image):
     return None
 
 
-def delete_container(name):
+def delete_container(name, timeout=10, with_volumes=False):
     """
     Stops and deletes a container.
 
-    :param name: Name of the container to delete
+    :param str name: Name of the container to delete
+    :param bool with_volumes: TRUE to also delete volumes
     """
     log.info("Deleting container %s" % name)
     client = docker.Client(base_url='unix://var/run/docker.sock')
@@ -105,8 +106,8 @@ def delete_container(name):
         log.info("Container %s was not present in the first place." % name)
         return
 
-    client.stop(name)
-    client.remove_container(name)
+    client.stop(name, timeout=timeout)
+    client.remove_container(name, v=with_volumes)
 
 
 def create_container(name, image, command=None, environment=None, volumes=(), udp_ports=None, tcp_ports=None,

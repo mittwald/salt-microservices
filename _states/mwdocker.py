@@ -69,14 +69,16 @@ def running(name, image, volumes=(), restart=True, tcp_ports=(), udp_ports=(), e
                                                               labels=labels)
 
         if not matches_spec and stateful:
-            ret["result"] = False
-            ret["comment"] = 'Existing container does not match specification, and I\'m to scared to delete it.'
+            ret['comment'] += "Deleting old version of container %s with gracious timeout, keeping volumes\n" % name
+            if not __opts__['test']:
+                # noinspection PyCallingNonCallable
+                __salt__['mwdocker.delete_container'](name, timeout=60, with_volumes=False)
             return ret
         elif not matches_spec:
             ret['comment'] += "Deleting old version of container %s\n" % name
             if not __opts__['test']:
                 # noinspection PyCallingNonCallable
-                __salt__['mwdocker.delete_container'](name)
+                __salt__['mwdocker.delete_container'](name, with_volumes=True)
         else:
             ret['comment'] += 'Container exists and is up to spec.\n'
             return ret
@@ -206,7 +208,7 @@ def __does_existing_container_matches_spec(client, ret, existing, name, image, v
             up_to_spec = False
 
     if existing['Config']['Labels'] != labels:
-        res['changes']['labels'] = {'old': existing['Config']['Labels'], 'new': labels}
+        ret['changes']['labels'] = {'old': existing['Config']['Labels'], 'new': labels}
         up_to_spec = False
 
     return up_to_spec
