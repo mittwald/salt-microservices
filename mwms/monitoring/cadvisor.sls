@@ -1,4 +1,4 @@
-{% set cadvisor_port = salt['pillar.get']('cadvisor:port', 8080) %}
+{% set cadvisor_args = salt['pillar.get']('cadvisor:arguments', {}) %}
 
 /usr/local/sbin/cadvisor:
   file.managed:
@@ -9,7 +9,7 @@
   file.managed:
     - contents: |
         [program:cadvisor]
-        command=/usr/local/sbin/cadvisor -port {{ cadvisor_port }}
+        command=/usr/local/sbin/cadvisor {% for k, v in cadvisor_args | dictsort %}-{{ k }}={{ v }}{% endfor %}
     - require:
       - file: /usr/local/sbin/cadvisor
     - watch_in:
@@ -21,7 +21,7 @@
         {
           "service": {
             "name": "cadvisor",
-            "port": {{ cadvisor_port }}
+            "port": {{ salt['pillar.get']('cadvisor:arguments:port', 8080) }}
           }
         }
     - require:
