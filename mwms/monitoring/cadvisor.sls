@@ -9,7 +9,7 @@
   file.managed:
     - contents: |
         [program:cadvisor]
-        command=/usr/local/sbin/cadvisor {% for k, v in cadvisor_args | dictsort %}-{{ k }}={{ v }}{% endfor %}
+        command=/usr/local/sbin/cadvisor {% for k, v in cadvisor_args | dictsort %} -{{ k }}={{ v }}{% endfor %}
     - require:
       - file: /usr/local/sbin/cadvisor
     - watch_in:
