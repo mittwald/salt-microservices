@@ -1,4 +1,4 @@
-{% set cadvisor_port = 8080 %}
+{% set cadvisor_port = salt['pillar.get']('cadvisor:port', 8080) %}
 
 /usr/local/sbin/cadvisor:
   file.managed:
