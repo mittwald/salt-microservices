@@ -1,7 +1,7 @@
 {% set prom_config = salt['pillar.get']('prometheus:configuration', {}) %}
 {% set prom_data_dir = salt['pillar.get']('prometheus:data_dir', '/var/lib/prometheus') %}
 {% set prom_internal_port = salt['pillar.get']('prometheus:internal_port', 9090) %}
-{% set prom_alerts = salt['pillar.get']('prometheus:alerts') %}
+{% set prom_alerts = salt['pillar.get']('prometheus:alerts', {}) %}
 
 {% if not 'rule_files' in prom_config %}
 {% do prom_config.update({'rule_files': ['alerts.rules']}) %}
