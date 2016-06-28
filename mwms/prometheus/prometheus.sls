@@ -1,3 +1,6 @@
+{% set consul_pattern = salt['pillar.get']('consul:server_pattern', 'consul-server*') -%}
+{% set consul_targetmode = salt['pillar.get']('consul:server_target_mode', 'glob') -%}
+
 {% set prom_config = salt['pillar.get']('prometheus:configuration', {}) %}
 {% set prom_data_dir = salt['pillar.get']('prometheus:data_dir', '/var/lib/prometheus') %}
 {% set prom_internal_port = salt['pillar.get']('prometheus:internal_port', 9090) %}
@@ -38,6 +41,8 @@ prometheus:
     - tcp_ports:
       - port: {{ prom_internal_port }}
         address: 0.0.0.0
+    - dns:
+      - {{ salt['grains.get']('fqdn_ip4') }}
     - warmup_wait: 10
     - labels:
         service: prometheus
