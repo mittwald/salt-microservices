@@ -49,3 +49,37 @@ microservices:
           MYSQL_PASSWORD: supersecret
           MYSQL_USER: myapp
           MYSQL_DATABASE: myapp
+
+prometheus:
+  proxy:
+    server_name: prometheus.example.com
+    ssl_certificate: /etc/ssl/certs/prometheus.example.com.pem
+    ssl_key: /etc/ssl/private/prometheus.example.com.key
+  alerts:
+    InstanceDown: |
+      ALERT InstanceDown
+        IF up == 0
+        FOR 1m
+        LABELS { severity="critical" }
+        ANNOTATIONS {
+          summary = {% raw %}"Instance {{ $labels.instance }} down"{% endraw %}
+        }
+  configuration:
+    global:
+      scrape_interval: 15s
+      evaluation_interval: 15s
+
+    scrape_configs:
+      - job_name: prometheus
+        static_configs:
+          - targets:
+            - localhost:9090
+
+alertmanager:
+  configuration:
+    global:
+      # The smarthost and SMTP sender used for mail notifications.
+      smtp_smarthost: mail.example.com
+      smtp_from: 'alertmanager@example.com'
+      smtp_auth_username: ''
+      smtp_auth_password: ''
