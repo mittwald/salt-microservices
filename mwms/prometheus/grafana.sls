@@ -24,8 +24,7 @@ grafana:
     - links:
         prometheus: prometheus
     - warmup_wait: 10
-    - dns:
-      - {{ salt['grains.get']('fqdn_ip4') }}
+    - dns: {{ salt['grains.get']('fqdn_ip4') }}
     - labels:
         service: prometheus
         service_group: prometheus-grafana

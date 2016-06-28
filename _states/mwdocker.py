@@ -34,7 +34,7 @@ def running(name, image, volumes=(), restart=True, tcp_ports=(), udp_ports=(), e
     :param list     udp_ports   : UDP ports to expose. This is a list of dictionaries that must provide a "port" and an "address" key
     :param dict     environment : A dictionary of environment variables to pass into the container
     :param str|list command     : The command to use for the container
-    :param list     dns         : A list of DNS server addresses to use
+    :param str      dns         : DNS server address to use
     :param str      domain      : The DNS search domain
     :param list     volumes_from: A list of container names from which to use the volumes
     :param dict     links       : A dictionary of containers to link (using the container name as index and the alias as value)

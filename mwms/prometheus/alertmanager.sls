@@ -18,8 +18,7 @@ alertmanager:
       - port: 9093
         address: 0.0.0.0
     - warmup_wait: 10
-    - dns:
-      - {{ salt['grains.get']('fqdn_ip4') }}
+    - dns: {{ salt['grains.get']('fqdn_ip4') }}
     - labels:
         service: prometheus
         service_group: prometheus-alertmanager

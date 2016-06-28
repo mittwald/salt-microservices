@@ -41,8 +41,7 @@ prometheus:
     - tcp_ports:
       - port: {{ prom_internal_port }}
         address: 0.0.0.0
-    - dns:
-      - {{ salt['grains.get']('fqdn_ip4') }}
+    - dns: {{ salt['grains.get']('fqdn_ip4') }}
     - warmup_wait: 10
     - labels:
         service: prometheus
