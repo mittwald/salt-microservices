@@ -106,7 +106,7 @@ def redeploy(service_name, tag_override='latest'):
                 if 'http_internal_port' in container_config:
                     container_http_port = container_config['http_internal_port']
 
-                ports.append({"address": "127.0.0.1", "port": container_http_port, "host_port": host_port})
+                ports.append({"address": "0.0.0.0", "port": container_http_port, "host_port": host_port})
             elif 'ports' in container_config:
                 ports += container_config['ports']
 
