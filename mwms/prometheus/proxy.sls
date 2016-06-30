@@ -12,7 +12,8 @@
     - template: jinja
     - context:
         server_name: {{ salt['pillar.get']('prometheus:proxy:server_name', 'prometheus.example.org') }}
-        internal_port: {{ salt['pillar.get']('prometheus:internal_port', 9090) }}
+        prometheus_internal_port: {{ salt['pillar.get']('prometheus:internal_port', 9090) }}
+        alertmanager_internal_port: {{ salt['pillar.get']('alertmanager:internal_port', 9093) }}
         ssl_certificate: {{ salt['pillar.get']('prometheus:proxy:ssl_certificate') }}
         ssl_key: {{ salt['pillar.get']('prometheus:proxy:ssl_key') }}
     - require:
