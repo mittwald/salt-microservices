@@ -39,9 +39,9 @@ def run():
             ]
         },
         prom_data_dir: {
-            'file.directory': {
+            'file.directory': [
                 {'makedirs': True}
-            }
+            ]
         },
         'prometheus': {
             'mwdocker.running': [
