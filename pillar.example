@@ -21,6 +21,9 @@ consul:
         - http: http://webservice.example.com
           interval: 5m
 
+nginx:
+  client_max_body_size: 128
+
 microservices:
   example:
     hostname: example.services.acme.co
